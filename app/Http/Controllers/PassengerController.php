@@ -109,4 +109,16 @@ class PassengerController extends ApiController
         }
     }
 
+    public function cancelBooking()
+    {
+        $passengers = Passenger::all();
+        foreach ($passengers as $passenger) {
+            $createdAt = Carbon::parse($passenger->created_at);
+            $diff      = $createdAt->diffInHours($now);
+            if ($diff >= 3) {
+                $passenger->update(["status" => 1]);
+            }
+        }
+    }
+
 }
