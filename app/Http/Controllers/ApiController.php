@@ -404,4 +404,15 @@ class ApiController extends Controller
             ],
         ];
     }
+
+    public function convertPaginationResponse($response)
+    {
+        $data['meta'] = $response['meta'];
+
+        unset($response['meta']);
+        $data['data'] = $response;
+
+        return $data;
+    }
+
 }

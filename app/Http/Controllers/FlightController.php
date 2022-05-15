@@ -2,43 +2,68 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\ApiController;
+use App\Models\Flight;
+use App\Models\Metro;
+use App\Transformers\FlightTransformer;
 use Carbon\Carbon;
-use Flight;
-use Metro;
+use League\Fractal\Pagination\IlluminatePaginatorAdapter;
+use Spatie\Fractal\Fractal;
 
-class FlightController extends Controller
+class FlightController extends ApiController
 {
-    /**
-     * Create a new controller instance.
-     *
-     * @return void
-     */
-    /**
-     * Show the application dashboard.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
+    {
+        $flights = Flight::paginate(10);
+        if ($flights->isEmpty()) {
+            return $this->respondNotFound("Records not found.");
+        }
+
+        $response = fractal()
+            ->collection($flights)
+            ->transformWith(new FlightTransformer())
+            ->serializeWith(new \Spatie\Fractalistic\ArraySerializer())
+            ->paginateWith(new IlluminatePaginatorAdapter($flights))
+            ->toArray();
+        $response = $this->convertPaginationResponse($response);
+
+        return $this->setMessage("Flights.")
+            ->respondWithStatus($response);
+    }
+
+    public function generate()
     {
         //$days   = Day::all();
         $metros = Metro::all();
         foreach ($metros as $metro) {
             switch ($metro->id) {
                 case 1:
-                    $this->createFlights(5, 3, "00.30", $metro->id, 4);
+                    for ($i = 1; $i <= 5; $i++) {
+                        $this->createFlights($i, 3, "00.30", $metro->id, 4);
+                    }
                     break;
                 case 2:
-                    $this->createFlights(5, 3, "00.30", $metro->id, 4);
+                    for ($i = 1; $i <= 5; $i++) {
+                        $this->createFlights($i, 3, "00.30", $metro->id, 4);
+                    }
                 case 3:
-                    $this->createFlights(3, 2, "01.00", $metro->id, 5);
+                    for ($i = 1; $i <= 3; $i++) {
+                        $this->createFlights($i, 2, "01.00", $metro->id, 5);
+                    }
                     break;
                 case 4:
-                    $this->createFlights(3, 2, "01.00", $metro->id, 5);
+                    for ($i = 1; $i <= 3; $i++) {
+                        $this->createFlights($i, 2, "01.00", $metro->id, 5);
+                    }
                 case 5:
-                    $this->createFlights(4, 4, "01.30", $metro->id, 3);
+                    for ($i = 1; $i <= 4; $i++) {
+                        $this->createFlights($i, 4, "01.30", $metro->id, 3);
+                    }
                     break;
                 case 6:
-                    $this->createFlights(4, 4, "01.30", $metro->id, 3);
+                    for ($i = 1; $i <= 4; $i++) {
+                        $this->createFlights($i, 4, "01.30", $metro->id, 3);
+                    }
                     break;
 
                 default:
@@ -46,23 +71,26 @@ class FlightController extends Controller
                     break;
             }
         }
+        return response()->json(["message" => 'Flights inserted successfully'], 200);
     }
-    public function createFlights($days, $duration, $initialTime, $metroId, $itteration)
+    public function createFlights($day, $duration, $initialTime, $metroId, $itteration)
     {
 
-        for ($i = 1; $i <= $days; $i++) {
+        for ($j = 1; $j <= $itteration; $j++) {
             $newTime = Carbon::parse($initialTime);
-            for ($j = 1; $j <= $itteration; $j++) {
+            if ($j == 1) {
+                $departureTime = $newTime;
+            } else {
                 $departureTime = $newTime->addHour($j * $duration);
-                Flight::insert([
-                    [
-                        "metro_id"       => $metroId,
-                        "departure_time" => $departureTime,
-                        "day_id"         => $i,
-                        "price"          => 3000.00,
-                    ],
-                ]);
             }
+            Flight::insert([
+                [
+                    "metro_id"       => $metroId,
+                    "departure_time" => $departureTime,
+                    "day_id"         => $day,
+                    "price"          => 3000.00,
+                ],
+            ]);
         }
     }
 }

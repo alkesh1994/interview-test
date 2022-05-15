@@ -11,10 +11,14 @@ class PassengerTransformer extends TransformerAbstract
      *
      * @return array
      */
-    public function transform()
+    public function transform($item)
     {
         return [
-            //
+            'id'           => $item->id,
+            'paid'         => $item->paid,
+            'amount'       => $item->amount,
+            'flight'       => $item->flight,
+            'registration' => $item->registration,
         ];
     }
 }

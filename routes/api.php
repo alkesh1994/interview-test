@@ -19,8 +19,19 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
 
 Route::group(['prefix' => 'v1'], function () {
 
-    //employee
+    //flight
     Route::group(['prefix' => 'flights'], function () {
         Route::get('/', 'FlightController@index');
+        Route::get('/generate', 'FlightController@generate');
+    });
+
+    //flight
+    Route::group(['prefix' => 'registration'], function () {
+        Route::post('/', 'RegistrationController@create');
+        Route::get('/check', 'RegistrationController@isRegistered');
+    });
+
+    Route::group(['prefix' => 'passengers'], function () {
+        Route::post('/', 'PassengerController@create');
     });
 });
