@@ -59,6 +59,7 @@ class FlightController extends Controller
                         "metro_id"       => $metroId,
                         "departure_time" => $departureTime,
                         "day_id"         => $i,
+                        "price"          => 3000.00,
                     ],
                 ]);
             }
